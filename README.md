@@ -1,4 +1,4 @@
-# Sloth
+# Sloth - A Notetaking app for Android
 
 Sloth is a Android note taking app devloped by Mobi Social Coding Team
 ### developed by these Collaborators:
