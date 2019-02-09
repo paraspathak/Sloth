@@ -2,6 +2,14 @@
 
 Sloth is a Android note taking app devloped by Mobi Social Coding Team
 ### developed by these Collaborators:
+-
+- 
+- 
+- 🎉 Zachery Gentry 🎉
+
+## UI-Mockup
+![alt text](Sloth/images/page1.png "Page 1")
+![alt text](Sloth/images/page2.png "Page 2")
 
 ## Getting Started with Github
 First of all WELCOME! Github is an amazing tool for collaborating with people and making sure you never lose your code to life's little disaters! Here's a couple of things to help you get started:
