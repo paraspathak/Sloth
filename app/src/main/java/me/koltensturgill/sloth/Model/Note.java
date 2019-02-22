@@ -2,10 +2,19 @@ package me.koltensturgill.sloth.Model;
 
 import java.util.ArrayList;
 
+//@Entity
 public class Note {
+
+    //@ColumnInfo(name = "note_title")
     public String title;
+
+    //@ColumnInfo(name = "content")
     public String body;
+
+    //@ColumnInfo(name = "tags")
     public ArrayList<String> tags;
+
+    //@PrimaryKey
     public int notebookId;
 
     //Base constructor
