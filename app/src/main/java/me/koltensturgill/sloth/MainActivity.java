@@ -2,13 +2,11 @@ package me.koltensturgill.sloth;
 
 import android.app.Activity;
 import android.arch.lifecycle.Observer;
-import android.arch.lifecycle.ViewModelProvider;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
@@ -32,19 +30,20 @@ import me.koltensturgill.sloth.Model.NotesViewModel;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener {
 
-    public static int _CREATE = 1;
-
+    Activity activity;
+    public static final int NEW_NOTE_ACTIVITY_REQUEST_CODE = 1;
     EditText editText;
 
     private NotesViewModel notesViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Utils.setThemeToActivity(this, true);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        activity = this;
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
 
         final Intent intent = new Intent(this, Editor.class);
@@ -52,9 +51,7 @@ public class MainActivity extends AppCompatActivity
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-            // Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-            // .setAction("Action", null).show();
-            startActivityForResult(intent, _CREATE);
+            startActivityForResult(intent, NEW_NOTE_ACTIVITY_REQUEST_CODE);
             }
         });
 
@@ -143,13 +140,54 @@ public class MainActivity extends AppCompatActivity
         try {
             super.onActivityResult(requestCode, resultCode, data);
 
-            if (requestCode == _CREATE  && resultCode == RESULT_OK) {
-
-                String requiredValue = data.getStringExtra("key");
+            if (requestCode == NEW_NOTE_ACTIVITY_REQUEST_CODE  && resultCode == RESULT_OK) {
+                String extra = data.getStringExtra(Editor.EXTRA_EDITOR);
+                //Determine the note title from the body of the note.
+                String title = getNoteTitle(extra);
+                //Chop the title off the string before creating a note from it.
+                extra = extra.substring(title.length());
+                Note note = new Note(title, extra);
+                notesViewModel.insert(note);
+            } else {
+                Toast.makeText(getApplicationContext(), "Not saved", Toast.LENGTH_SHORT).show();
             }
         } catch (Exception ex) {
             Toast.makeText(this, ex.toString(),
-                    Toast.LENGTH_SHORT).show();
+                    Toast.LENGTH_LONG).show();
         }
+    }
+
+    protected String getNoteTitle(String note){
+        int firstNewLine = note.indexOf('\n');
+        //Hardcoded max title length, probably a better way of doing this.
+        int maxTitleLength = 30;
+
+        String title;
+        //No newline character found
+        if(firstNewLine == -1){
+            //Dont want to control the length of our title
+            if(note.length() > maxTitleLength) {
+                title = note.substring(0, maxTitleLength);
+            }
+            else{ //else one line note, set title to the note itself.
+                title = note;
+            }
+        //Newline Character found within max title limit
+        } else {
+            title = note.substring(0, firstNewLine);
+        }
+        //if first character is not a hashtag, insert one at the beginning
+        if(title.charAt(0) != '#'){
+            title = "#" + title;
+        }
+        return title;
+    }
+
+    //onRestart method recreates main activity so when theme is changed in settings, activity recreates so new theme can be applied from Utils
+    @Override
+    protected void onRestart()
+    {
+        super.onRestart();
+        recreate();
     }
 }
